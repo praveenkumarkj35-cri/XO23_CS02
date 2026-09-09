@@ -174,6 +174,25 @@ export async function submitAdaptationDecision(changeId: string, decision: 'APPR
 }
 
 export function getWebSocketUrl(): string {
+  // 1. Explicit WebSocket URL if configured
+  if (import.meta.env.VITE_WS_URL) {
+    return import.meta.env.VITE_WS_URL;
+  }
+
+  // 2. Derive WebSocket URL from VITE_API_URL if configured
+  const apiUrl = import.meta.env.VITE_API_URL;
+  if (apiUrl) {
+    try {
+      const url = new URL(apiUrl);
+      const wsProtocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+      const host = url.host;
+      return `${wsProtocol}//${host}/ws/events`;
+    } catch {
+      // Fallback if URL parsing fails
+    }
+  }
+
+  // 3. Fallback for local development
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const host = window.location.hostname || 'localhost';
   return `${protocol}//${host}:8000/ws/events`;
