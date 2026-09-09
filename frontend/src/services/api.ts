@@ -4,7 +4,35 @@ import {
   BaselineHistory, EvaluationRunResult, JudgeDemoStatus 
 } from '../types';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// Deterministic production vs. local backend configuration
+const PRODUCTION_API_URL = 'https://xo23-cs02-2.onrender.com';
+const PRODUCTION_WS_URL = 'wss://xo23-cs02-2.onrender.com/ws/events';
+const LOCAL_API_URL = 'http://localhost:8000';
+const LOCAL_WS_URL = 'ws://localhost:8000/ws/events';
+
+export function isLocalHost(): boolean {
+  if (typeof window === 'undefined') return false;
+  const h = window.location.hostname;
+  return h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0';
+}
+
+export function getApiBaseUrl(): string {
+  // 1. Explicit build-time environment variable if set
+  const envApiUrl = import.meta.env.VITE_API_URL;
+  if (envApiUrl && typeof envApiUrl === 'string' && envApiUrl.trim() !== '') {
+    return envApiUrl.trim().replace(/\/+$/, '');
+  }
+
+  // 2. Local development fallback
+  if (isLocalHost()) {
+    return LOCAL_API_URL;
+  }
+
+  // 3. Guaranteed production backend URL for Netlify and other deployments
+  return PRODUCTION_API_URL;
+}
+
+const API_BASE = getApiBaseUrl();
 
 export async function fetchHealth() {
   const res = await fetch(`${API_BASE}/api/health`);
@@ -174,16 +202,17 @@ export async function submitAdaptationDecision(changeId: string, decision: 'APPR
 }
 
 export function getWebSocketUrl(): string {
-  // 1. Explicit WebSocket URL if configured
-  if (import.meta.env.VITE_WS_URL) {
-    return import.meta.env.VITE_WS_URL;
+  // 1. Explicit WebSocket URL if configured (VITE_WS_URL)
+  const envWsUrl = import.meta.env.VITE_WS_URL;
+  if (envWsUrl && typeof envWsUrl === 'string' && envWsUrl.trim() !== '') {
+    return envWsUrl.trim();
   }
 
   // 2. Derive WebSocket URL from VITE_API_URL if configured
-  const apiUrl = import.meta.env.VITE_API_URL;
-  if (apiUrl) {
+  const envApiUrl = import.meta.env.VITE_API_URL;
+  if (envApiUrl && typeof envApiUrl === 'string' && envApiUrl.trim() !== '') {
     try {
-      const url = new URL(apiUrl);
+      const url = new URL(envApiUrl.trim());
       const wsProtocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
       const host = url.host;
       return `${wsProtocol}//${host}/ws/events`;
@@ -192,10 +221,15 @@ export function getWebSocketUrl(): string {
     }
   }
 
-  // 3. Fallback for local development
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const host = window.location.hostname || 'localhost';
-  return `${protocol}//${host}:8000/ws/events`;
+  // 3. Fallback ONLY for local development (localhost / 127.0.0.1)
+  if (isLocalHost()) {
+    const protocol = (typeof window !== 'undefined' && window.location.protocol === 'https:') ? 'wss:' : 'ws:';
+    return `${protocol}//localhost:8000/ws/events`;
+  }
+
+  // 4. Guaranteed production fallback
+  // NEVER construct a production WebSocket URL using the current Netlify hostname with port 8000
+  return PRODUCTION_WS_URL;
 }
 
 // ============================================================
