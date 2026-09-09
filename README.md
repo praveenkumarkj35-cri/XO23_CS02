@@ -1,83 +1,32 @@
-# 🛡️ TRUSTNEXUS AI
+# React + TypeScript + Vite
 
-### Adaptive Behavioral Trust for Non-Human Identities
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-> **Trust Behavior. Not Just Identity.**
+Currently, two official plugins are available:
 
-TRUSTNEXUS AI is an adaptive security system that continuously monitors **Non-Human Identities (NHIs)** such as service accounts, APIs, bots, workloads, and automation identities.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-Instead of trusting an identity only because its credentials are valid, TRUSTNEXUS analyzes its **individual behavioral baseline** and detects abnormal changes.
+## React Compiler
 
-## 🚀 Key Features
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-- 🔍 Continuous NHI Monitoring
-- 🧠 Individual Behavioral Profiling
-- 📊 Adaptive Trust Scoring
-- 🔄 Behavioral Drift Detection
-- 🛡️ Adaptive Baseline Protection
-- ☠️ Baseline Poisoning Detection
-- 🚨 Explainable Risk Analysis
-- ⚡ Real-Time Event Monitoring
-- 🎯 Attack Simulation
+## Expanding the Oxlint configuration
 
-## 🔄 Core Flow
+If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
 
-```text
-NHI Activity
-     ↓
-Behavioral Baseline
-     ↓
-Risk & Anomaly Analysis
-     ↓
-NORMAL / DRIFTING / SUSPICIOUS / HIGH-RISK
-     ↓
-Adaptive Trust Gate
-     ↓
-Safe → Update Baseline
-Unsafe → Block & Protect
+```json
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "options": {
+    "typeAware": true
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  }
+}
 ```
 
-## 🟢 Trust States
-
-| State | Meaning |
-|---|---|
-| 🟢 NORMAL | Behavior matches baseline |
-| 🟡 DRIFTING | Behavior changed but appears legitimate |
-| 🟠 SUSPICIOUS | Multiple unusual indicators detected |
-| 🔴 HIGH-RISK | Strong evidence of compromise |
-
-## 🛠️ Tech Stack
-
-**Frontend:** React, Vite, TypeScript, Tailwind CSS  
-**Backend:** FastAPI, Python, WebSocket, SQLite  
-**Analytics:** NumPy, Pandas, Scikit-learn
-
-## 🎯 Hackathon Demo
-
-The prototype demonstrates:
-
-1. Normal NHI behavior
-2. Legitimate workload evolution
-3. Sudden attack detection
-4. Gradual baseline poisoning
-5. Safe adaptive baseline updates
-6. Explainable risk decisions
-
-## 🔐 Security Approach
-
-**Valid credentials ≠ Trusted behavior**
-
-TRUSTNEXUS continuously asks:
-
-> **“Is this NHI behaving the way it normally should?”**
-
-The system uses **synthetic/simulated NHI data** for hackathon demonstration and does not require real credentials or production infrastructure.
-
----
-
-### 🏆 Project
-
-**TRUSTNEXUS AI**  
-*Adaptive Behavioral Trust for Non-Human Identities*
-
-> **Trust Behavior. Not Just Identity.**
+See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
